@@ -1,0 +1,3 @@
+- Map: Geometrical Dominator
+- Creator: byANG3L
+- From: BSWorld Modpack (https://youtu.be/1TN56NLlShE)
