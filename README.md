@@ -9,5 +9,5 @@ Extract and copy paste *the files* in your BombSquad folder.
 
 
 - 🎯 Current mods
-- Gamemodes: 3
+- Gamemodes: 4
 - Utilities: 3
