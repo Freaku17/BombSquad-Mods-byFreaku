@@ -8,6 +8,6 @@ press Green color [Code] in top right and download Zip.
 Extract and copy paste *the files* in your BombSquad folder.
 
 
-- 🎯 Current mods
-- Gamemodes: 5
-- Utilities: 4
+### 🎯 Current mods
+* Gamemodes: 5
+* Utilities: 4
