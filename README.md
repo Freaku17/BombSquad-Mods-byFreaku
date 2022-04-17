@@ -24,4 +24,4 @@ Extract and copy paste *the files* in your BombSquad folder.
 
 
 
-### All Gamemodes are supported servers!
+### All Gamemodes are supported on servers!
