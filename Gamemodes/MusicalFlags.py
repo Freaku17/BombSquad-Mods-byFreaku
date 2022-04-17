@@ -128,7 +128,7 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
         exec(base64.b64decode("aWYgc2VsZi5jcmVkaXRfdGV4dDoKICAgICMjIFBlb3BsZSBzdGVhbGVkIGNyZWRpdHMgc28gdGhhdHMgd2h5IEkgZW5jb2RlZCB0aGlzLi4uCiAgICAjIyBFdmVuIHRobyB0aGVyZSBpcyBhIG9wdGlvbiwgdGhleSBjaGFuZ2VkIGNyZWF0ZWQgYnkKICAgICMjIGxpa2Ugd3RmIGlzIHRoaWVyIHByb2JsZW0/PwoKICAgICMjIEFueXdheXMgaGF2ZSBhIGdvb2QgZGF5IQogICAgdCA9IGJhLm5ld25vZGUoJ3RleHQnLAogICAgICAgICAgICAgICBhdHRycz17ICd0ZXh0JzoiUG9ydGVkIGJ5IO6BiEZyZWFrdVxuTWFkZSBieSBNYXR0WjQ1OTg2IiwgIyMgRGlzYWJsZSAnRW5hYmxlIEJvdHRvbSBDcmVkaXRzJyB3aGVuIG1ha2luZyBwbGF5bGlzdCwgTm8gbmVlZCB0byBlZGl0IHRoaXMgbG92ZWx5Li4uCiAgICAgICAgJ3NjYWxlJzowLjcsCiAgICAgICAgJ3Bvc2l0aW9uJzooMCwwKSwKICAgICAgICAnc2hhZG93JzowLjUsCiAgICAgICAgJ2ZsYXRuZXNzJzoxLjIsCiAgICAgICAgJ2NvbG9yJzooMSwgMSwgMSksCiAgICAgICAgJ2hfYWxpZ24nOidjZW50ZXInLAogICAgICAgICd2X2F0dGFjaCc6J2JvdHRvbSd9KQ==").decode('UTF-8'))
         self.makeRound()
         self._textRound.text = 'Round ' + str(self.roundNum)
-        ba.timer(5, self.checkEnd, repeat=True)
+        ba.timer(5, self.checkEnd)
 
     def makeRound(self):
         for player in self.players:
@@ -188,6 +188,7 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
             ba.timer(0.1, ba.Call(self.check_respawn, player))
             ba.timer(0.5, self.checkEnd)
         elif isinstance(msg, FlagPickedUpMessage):
+            e = 0
             self.numPickedUp += 1
             msg.node.getdelegate(PlayerSpaz, True).getplayer(Player, True).done = True
             l = ba.newnode('light',
@@ -199,16 +200,25 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
             msg.flag.handlemessage(ba.DieMessage())
             msg.node.handlemessage(ba.DieMessage())
             msg.node.delete()
-            if self.numPickedUp == len(self.flags):
+            if self.numPickedUp >= len(self.flags):
                 for player in self.spawned:
                     if not player.done:
-                        ba.screenmessage("No Flag? "+player.getname())
-                        player.survived = False
-                        player.actor.handlemessage(ba.StandMessage((0,3,-2)))
-                        ba.timer(0.5,ba.Call(player.actor.handlemessage, ba.FreezeMessage()))
-                        ba.timer(3,ba.Call(player.actor.handlemessage, ba.ShouldShatterMessage()))
+                        try:
+                            player.survived = False
+                            ba.screenmessage("No Flag? "+player.getname())
+                            player.actor.handlemessage(ba.StandMessage((0,3,-2)))
+                            ba.timer(0.5,ba.Call(player.actor.handlemessage, ba.FreezeMessage()))
+                            ba.timer(3,ba.Call(player.actor.handlemessage, ba.ShouldShatterMessage()))
+                        except: pass
                 ba.timer(3.5,self.killRound)
                 ba.timer(3.55,self.makeRound)
+            else:
+                for player in self.spawned:
+                    if player.survived:
+                        e += 1
+                if e == len(self.spawned):
+                    ba.timer(3.5,self.killRound)
+                    ba.timer(3.55,self.makeRound)
         else:
             return super().handlemessage(msg)
         return None
