@@ -178,7 +178,7 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
 
     def check_respawn(self, player):
         if not player.done and player.survived:
-            self.respawn_player(player, 1.5)
+            self.respawn_player(player, 2.5)
 
     def handlemessage(self, msg: Any) -> Any:
 
@@ -200,7 +200,7 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
             msg.flag.handlemessage(ba.DieMessage())
             msg.node.handlemessage(ba.DieMessage())
             msg.node.delete()
-            if self.numPickedUp >= len(self.flags):
+            if self.numPickedUp == len(self.flags):
                 for player in self.spawned:
                     if not player.done:
                         try:
@@ -216,7 +216,7 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
                 for player in self.spawned:
                     if player.survived:
                         e += 1
-                if e == len(self.spawned):
+                if e == len(self.players):
                     ba.timer(3.5,self.killRound)
                     ba.timer(3.55,self.makeRound)
         else:
