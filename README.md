@@ -10,14 +10,14 @@ Extract and copy paste *the files* in your BombSquad folder.
 
 ### 🎯 Current mods
 * Gamemodes: 5
-   * **Frozen One
-   * **Icy Emits
+   * Frozen One
+   * Icy Emits
    * **Volley Ball
    * **Musical Flags
    * **Memory Game
 
 * Utilities: 4
-   * **Floater: Type /floater in-game to use
-   * **IconsKeyboard: Enable "Always Use Internal Keyboard" in settings/advanced and double+tap space to use
-   * **Terminal: Shows error the mod you're working on (read instructions in-file)
-   * **TowerD-Unlocked: Unlocks TowerD map to use in Teams/FFA
+   * Floater: Type /floater in-game to use
+   * IconsKeyboard: Enable "Always Use Internal Keyboard" in settings/advanced and double+tap space to use
+   * Terminal: Shows error the mod you're working on (read instructions in-file)
+   * TowerD-Unlocked: Unlocks TowerD map to use in Teams/FFA
