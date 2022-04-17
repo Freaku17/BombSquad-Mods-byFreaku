@@ -188,7 +188,6 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
             ba.timer(0.1, ba.Call(self.check_respawn, player))
             ba.timer(0.5, self.checkEnd)
         elif isinstance(msg, FlagPickedUpMessage):
-            e = 0
             self.numPickedUp += 1
             msg.node.getdelegate(PlayerSpaz, True).getplayer(Player, True).done = True
             l = ba.newnode('light',
@@ -212,13 +211,6 @@ class MFGame(ba.TeamGameActivity[Player, Team]):
                         except: pass
                 ba.timer(3.5,self.killRound)
                 ba.timer(3.55,self.makeRound)
-            else:
-                for player in self.spawned:
-                    if player.survived:
-                        e += 1
-                if e == len(self.players):
-                    ba.timer(3.5,self.killRound)
-                    ba.timer(3.55,self.makeRound)
         else:
             return super().handlemessage(msg)
         return None
