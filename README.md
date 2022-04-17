@@ -12,9 +12,9 @@ Extract and copy paste *the files* in your BombSquad folder.
 * Gamemodes: 5
    * Frozen One
    * Icy Emits
-   * **Volley Ball
-   * **Musical Flags
-   * **Memory Game
+   * Volley Ball
+   * Musical Flags
+   * Memory Game
 
 * Utilities: 4
    * Floater: Type /floater in-game to use
