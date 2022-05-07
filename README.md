@@ -4,9 +4,9 @@
 press Green color [Code] in top right and download Zip.
 Extract and copy paste *the files* in your BombSquad folder.
 
-### All Gamemodes are supported on servers!
+###### All Gamemodes are supported on servers!
 
-### 🎯 Current mods
+### 🎯 Mods:
 * Gamemodes: 5
    * Frozen One
    * Icy Emits
