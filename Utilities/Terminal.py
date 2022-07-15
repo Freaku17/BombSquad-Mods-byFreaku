@@ -163,11 +163,11 @@ def yeet_sys():
 def update_mods():
     mods_folder = _ba.env()['python_directory_user']
     for mod in os.listdir(mods_folder):
-        if mod.endswith('.py'):
+        if mod.endswith('.py') and not mod=='Terminal.py':
             data = open(mods_folder+os.sep+mod).read()
-            data = data.replace('# ba_meta require api 7', '# ba_meta require api 7')
-            data = data.replace('def on_app_running(self)', 'def on_app_running(self)')
-            data = data.replace('self.on_app_running', 'self.on_app_running')
+            data = data.replace('# ba_meta require api 6', '# ba_meta require api 7')
+            data = data.replace('def on_app_launch(self)', 'def on_app_running(self)')
+            data = data.replace('self.on_app_launch', 'self.on_app_running')
             with open(mods_folder+os.sep+mod, 'w') as file:
                 file.write(data)
                 file.close()
