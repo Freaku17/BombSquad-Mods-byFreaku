@@ -1,6 +1,6 @@
 - 👋 Hi, My discord: @[Just] Freak#4999
 - ❤️ Learning Python, All my Mods can be found here (BombSquad v1.6+)
-     [Slowly updating all mods to v1.7+])
+- [[[Slowly transitioning all mods to v1.7+]]]
 - 🔥 Download my mods (turn on Desktop site if you're on mobile) and 
 press Green color [Code] in top right and download Zip.
 Extract and copy paste *the files* in your BombSquad folder.
