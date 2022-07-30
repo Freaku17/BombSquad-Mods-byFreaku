@@ -113,7 +113,7 @@ def make_logs(content):
 
 def log_it():
     our_logs = _ba.getlog()
-    if our_logs != '':
+    if our_logs:
         make_logs(our_logs)
     else:
         make_logs("🔥 Congratulations! No errors were found during this playing session!! 🔥")
@@ -165,7 +165,7 @@ def update_mods():
     for mod in os.listdir(mods_folder):
         if mod.endswith('.py') and not mod==__name__+'.py':
             data = open(mods_folder+os.sep+mod).read()
-            data = data.replace('# ba_meta require api 6', '# ba_meta require api 7')
+            data = data.replace('#'+' ba_meta require api 6', '#'+' ba_meta require api 7')
             data = data.replace('def on_app_launch(self)', 'def on_app_running(self)')
             data = data.replace('self.on_app_launch', 'self.on_app_running')
             with open(mods_folder+os.sep+mod, 'w') as file:
