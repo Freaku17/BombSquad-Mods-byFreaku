@@ -9,15 +9,13 @@
 
 
 
-# ba_meta require api 6
+# ba_meta require api 7
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import _ba,ba,random,math
 from bastd.gameutils import SharedObjects
 from bastd.actor.bomb import Bomb
 from bastd.actor.popuptext import PopupText
-try: from ba._generated.enums import InputType #1.6.5+
-except: from ba._enums import InputType #1.6.4 and lower
 if TYPE_CHECKING:
     from typing import Optional
 
@@ -245,13 +243,13 @@ def assignFloInputs(clientID: int):
                 i.resetinput()
                 floater.source_player = i
                 floater.con()
-                i.assigninput(InputType.PICK_UP_PRESS, floater.up)
-                i.assigninput(InputType.PICK_UP_RELEASE, floater.upR)
-                i.assigninput(InputType.JUMP_PRESS, floater.down)
-                i.assigninput(InputType.BOMB_PRESS, floater.drop)
-                i.assigninput(InputType.PUNCH_PRESS, ba.Call(dis, i, floater))
-                i.assigninput(InputType.UP_DOWN, floater.updown)
-                i.assigninput(InputType.LEFT_RIGHT, floater.leftright)
+                i.assigninput(ba.InputType.PICK_UP_PRESS, floater.up)
+                i.assigninput(ba.InputType.PICK_UP_RELEASE, floater.upR)
+                i.assigninput(ba.InputType.JUMP_PRESS, floater.down)
+                i.assigninput(ba.InputType.BOMB_PRESS, floater.drop)
+                i.assigninput(ba.InputType.PUNCH_PRESS, ba.Call(dis, i, floater))
+                i.assigninput(ba.InputType.UP_DOWN, floater.updown)
+                i.assigninput(ba.InputType.LEFT_RIGHT, floater.leftright)
 
 
 
@@ -260,8 +258,7 @@ old_fcm = _ba.chatmessage
 def new_chat_message(msg: Union[str, ba.Lstr], clients: Sequence[int] = None, sender_override: str = None):
     old_fcm(msg, clients, sender_override)
     if msg == '/floater':
-        if not clients: clients = -1
-        try: assignFloInputs(clients)
+        try: assignFloInputs(-1)
         except: pass
 _ba.chatmessage = new_chat_message
 
