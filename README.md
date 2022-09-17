@@ -1,8 +1,8 @@
 - 👋 Hi, My discord: @[Just] Freak#4999
 - ❤️ Learning Python, All my Mods can be found here (BombSquad v1.7+)
-- 🔥 Download my mods: (turn on Desktop site if you're on mobile) and 
-press Green color [Code] in top right and download Zip.
-Extract and copy paste *the files* in your BombSquad folder.
+- 🔥 Press [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white "Download zip")](https://github.com/Freaku17/BombSquad-Mods-byFreaku/archive/refs/heads/main.zip) 
+
+Then extract and copy paste *the files* in your BombSquad folder.
 
 ###### All Gamemodes are supported on servers!
 
