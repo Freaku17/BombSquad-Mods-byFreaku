@@ -2,11 +2,10 @@
 
 
 # Defines a simple plugin that allows you to:
-## See any errors of your mods (if present) in folder BombSquad/logging/logs.txt
-## Get config contents
-## Enable internal debugging
-## Create/Delete sys
-## Get 3D co-ordinate points in any Map!
+### See any errors of your mods (if present) in folder BombSquad/console/logs.txt
+### Get config contents
+### Create/Delete sys
+### Get 3D co-ordinate points in any Map!
 
 
 # NOTE: Please perform the activities to log, if its a gamemode pls open and play it and then see logs. If its a window please touch buttons and then see logs
@@ -27,7 +26,6 @@
 '''
 - Must READ
 - For beginners
-- Fixing errors...
 '''
 
 
@@ -44,49 +42,26 @@
 # This mod is *genuinely* for Mobile Modders, 
 # in PC you can directly get these Terminal Errors in console.
 # but sadly on mobile there's no way to view console.
-# We can, by following GitHub's Android coding environment
-# https://github.com/efroemling/ballistica/wiki/Coding-Environment-(Android)
-# but it's long process, additionally around 500mb of data to download
-# for Pydroid 3 and it's Pydroid's plugins... (not guaranteed to work properly)
+# We can alternatively, use https://tools.ballistica.net/devices
+# but it only works on V2 accounts (and if you link your GooglePlay and V2, and login with GooglePlay... it won't work)
 # This is helpful for new Modders (who don't use PC)
 # Also I'll ***HIGHLY*** suggest to not use this when other mods are installed
 # As a TONS of other mods includes errors (which aren't fixed)
-# Rename BombSquad folder to BombSquad1 and make a 
-# new BombSquad folder and paste this in that
-# and also the mod you're working on....
 # Happy coding! 🔥
-
-# Dont worry about those currency mods or similar stuffs...
-# Their data is still stored on app so whenever you use them back 
-# (deleting BombSquad folder and renaming BombSquad1 back to BombSquad)
-# All currency/data will still be avaiable!!
 '''
 
 # ----- For beginners -----
 '''
 # Use create_sys / delete_sys in Plugins
 # and a Code Editor app (on Play Store)
+
+# Then start playing (editing) those internal .py files
+# Incase you face a black screen on launch (you made an error while editing those sys files)
+# Delete the sys folder of folder Bombsquad/sys/{version} and re-open game
 '''
 
-# ----- Fixing errors... -----
-'''
-# Incase you haven't ever seen console:
-# The logs.txt shows full stuff ...
-# Like say you made a error in your mod but in logs you'll see entire file paths of in-game files.
 
-# Over here you should ignore in-game files and just see Exception/Traceback (or the path where your mod file is named)
-# and bottom lines (to know what error is it exactly)
-
-# Reason? Game is certainly completed so no matter what it wont have any error, the error causing is just your file.
-# Traceback could look like: Game called a activity as said in this-this line of file, then Map was loaded by the activity, then Map tried to fetch spawn points, but spawn points have error (since you modified it)
-'''
-
-# Additionally, errors like
-# - Invalid Syntax (if you use code editor just press 3 dots and off word wrap, so you can scroll left/right so you can see the ^ arrow pointing correctly) This error is either cuz of some brackets opened but not closed or the other way around. Could also be if you put = instead of ==
-# - Indentation error (this is related to spaces, Google can help/explain you in this...)
-# - etc etc (take help of Google 🤐)
-
-# Sometimes you can't just solve it yourself, so you need to ask someone for help
+# Sometimes you need someone for help
 # I would suggest to join BCS: A lovely discord server (link at top)
 
 # Aimed 4 Android modders!
@@ -98,42 +73,32 @@
 # ba_meta require api 7
 
 import _ba, ba, os
-folder = _ba.env()['python_directory_user'] + "/logging/"
-log_copy = folder + 'logs.txt'
-config_copy = folder + 'config.txt'
+from efro.log import LogLevel
+folder = _ba.env()['python_directory_user'] + "/console/"
+log_post = folder + 'logs.txt'
+config_post = folder + 'config.txt'
+
 
 def make_folder():
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-def make_logs(content):
-    with open(log_copy, 'w+') as l:
-        l.write(content)
-        l.close()
-
-def log_it():
-    our_logs = _ba.getlog()
-    if our_logs:
-        make_logs(our_logs)
-    else:
-        make_logs("🔥 Congratulations! No errors were found during this playing session!! 🔥")
-
-def make_config():
-    configs = _ba.app.config_file_path
-    config_contents = ''
-    with open(configs) as f:
-        config_contents = f.read()
-        f.close()
-    with open(config_copy, 'w+') as e:
-        e.write(config_contents)
+def make_config(entry):
+    with open(config_post, 'w+') as e:
+        e.write(entry)
         e.close()
 
-def internal_debug():
-    """
-    Eg. May show some error via screen msg even if try except is used.
-    Use only if you are going for really ADVANCED modding...
-    """
-    setattr(_ba.app, '_debug_enabled', True)
+def dump_cache_logs():
+    # Dumps all cache logs (including DEBUG ones)
+    for entry in ba.app.log_handler.get_cached().entries:
+        write_logs(entry.message)
+
+def make_logs(entry):
+    if entry.level.value >= LogLevel.WARNING.value or entry.name in ('stdout', 'stderr'):
+        write_logs(entry.message)
+
+def write_logs(log):
+    print(log, file=open(log_post, 'a+', encoding='utf-8'))
 
 def make_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
@@ -189,32 +154,31 @@ class update_16mods_to_17(ba.Plugin):
 class get_logs(ba.Plugin):
     def __init__(self):
         make_folder()
-        log_it()
-        ba.timer(1, log_it, repeat=True)
+        open(log_post, 'w+').close()
+        dump_cache_logs()
+        ba.app.log_handler.add_callback(make_logs)
 
 
 # ba_meta export plugin
 class get_config(ba.Plugin):
     def __init__(self):
-        make_config()
-
-
-# ba_meta export plugin
-class live_debug(ba.Plugin):
-    def __init__(self):
-        internal_debug()
+        make_folder()
+        configs = ba.app.config_file_path
+        with open(configs) as f:
+            make_config(f.read())
+            f.close()
 
 
 # ba_meta export plugin
 class create_sys(ba.Plugin):
     def __init__(self):
-        ba.timer(3, make_sys)
+        ba.timer(2.5, make_sys)
 
 
 # ba_meta export plugin
 class delete_sys(ba.Plugin):
     def __init__(self):
-        ba.timer(3.5, yeet_sys)
+        ba.timer(3, yeet_sys)
 
 
 
