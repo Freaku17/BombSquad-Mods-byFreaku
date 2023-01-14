@@ -103,7 +103,8 @@ def write_logs(log):
 def make_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
     if not os.path.exists(path):
-        ba.modutils.create_user_system_scripts()
+        import ba.modutils as utils
+        utils.create_user_system_scripts()
         if _ba.app.platform == 'android':
             if path.find('/0/'):
                 path = path.split('/0/')[1]
@@ -117,7 +118,8 @@ def make_sys():
 def yeet_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
     if os.path.exists(path):
-        ba.modutils.delete_user_system_scripts()
+        import ba.modutils as utils
+        utils.delete_user_system_scripts()
         ba.screenmessage('Scripts deleted!',color=(1, 1, 0))
         ba.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
         ba.app.config['Plugins'][__name__+'.delete_sys']['enabled'] = False
