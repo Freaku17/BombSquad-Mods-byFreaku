@@ -72,7 +72,7 @@
 
 # ba_meta require api 7
 
-import _ba, ba, os
+import _ba, ba, os, re
 from efro.log import LogLevel
 folder = _ba.env()['python_directory_user'] + "/console/"
 log_post = folder + 'logs.txt'
@@ -103,8 +103,11 @@ def write_logs(log):
 def make_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
     if not os.path.exists(path):
-        import ba.modutils as utils
-        utils.create_user_system_scripts()
+        if (_ba.app.platform == 'android') and (int(re.search(r"android (\d+)", _ba.env()["user_agent_string"]).group(1)) if re.search(r"android (\d+)", _ba.env()["user_agent_string"]) else 1) >= 13:
+            make_logs_for_android_13(path)
+        else:
+            import ba.modutils as utils
+            utils.create_user_system_scripts()
         if _ba.app.platform == 'android':
             if path.find('/0/'):
                 path = path.split('/0/')[1]
@@ -114,6 +117,21 @@ def make_sys():
         ba.app.config.apply_and_commit()
     else:
         ba.screenmessage('Cannot run '+__name__+'.create_sys\nScripts already exist :/',color=(1,0,0))
+
+def make_logs_for_android_13(path):
+    # With continued increasing restrictions of Android,
+    # it is not possible to "view" in-game folders copied to an external path.
+    # Luckily we are still able to write files.
+    # So as a "workaround" we create a zip of in-game folders and unzip them :D
+    from shutil import make_archive, unpack_archive, rmtree
+    sys_zip = make_archive('sys_zip', 'zip', _ba.app.python_directory_app)
+    unpack_archive(sys_zip, path)
+    
+    # We also need to delete all `__pycache__` folders
+    for root, dirs, files in os.walk(path):
+        if '__pycache__' in dirs:
+            pycache_folder = os.path.join(root, '__pycache__')
+            rmtree(pycache_folder)
 
 def yeet_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
