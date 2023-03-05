@@ -72,7 +72,7 @@
 
 # ba_meta require api 7
 
-import _ba, ba, os, re
+import _ba, ba, os
 from efro.log import LogLevel
 folder = _ba.env()['python_directory_user'] + "/console/"
 log_post = folder + 'logs.txt'
@@ -103,11 +103,10 @@ def write_logs(log):
 def make_sys():
     path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
     if not os.path.exists(path):
-        if (_ba.app.platform == 'android') and (int(re.search(r"android (\d+)", _ba.env()["user_agent_string"]).group(1)) if re.search(r"android (\d+)", _ba.env()["user_agent_string"]) else 1) >= 13:
-            make_sys_for_android_13(path)
-        else:
-            import ba.modutils as utils
-            utils.create_user_system_scripts()
+        # Old method:
+        # import ba.modutils as utils
+        # utils.create_user_system_scripts()
+        make_sys_wordaround(path)
         if _ba.app.platform == 'android':
             if path.find('/0/'):
                 path = path.split('/0/')[1]
@@ -118,7 +117,7 @@ def make_sys():
     else:
         ba.screenmessage('Cannot run '+__name__+'.create_sys\nScripts already exist :/',color=(1,0,0))
 
-def make_sys_for_android_13(path):
+def make_sys_wordaround(path):
     # With continued increasing restrictions of Android,
     # it is not possible to "view" in-game folders copied to an external path.
     # Luckily we are still able to write files.
