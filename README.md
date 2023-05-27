@@ -4,7 +4,7 @@
 
 Then extract and copy paste *the files* in your BombSquad folder.
 
-###### All Gamemodes are supported on servers!
+##### All Gamemodes are supported on servers!
 
 ### 🎯 Mods:
 * Gamemodes: 5
@@ -13,6 +13,7 @@ Then extract and copy paste *the files* in your BombSquad folder.
    * Volley Ball
    * Musical Flags
    * Memory Game
+   * Arms Race
 
 * Utilities: 4
    * Floater
