@@ -70,11 +70,12 @@
 
 
 
-# ba_meta require api 7
+# ba_meta require api 8
 
-import _ba, ba, os
+import _babase, babase, baenv, os
+import bascenev1 as bs
 from efro.log import LogLevel
-folder = _ba.env()['python_directory_user'] + "/console/"
+folder = _babase.env()['python_directory_user'] + "/console/"
 log_post = folder + 'logs.txt'
 config_post = folder + 'config.txt'
 
@@ -90,7 +91,7 @@ def make_config(entry):
 
 def dump_cache_logs():
     # Dumps all cache logs (including DEBUG ones)
-    for entry in ba.app.log_handler.get_cached().entries:
+    for entry in baenv._g_env_config.log_handler.get_cached().entries:
         write_logs(entry.message)
 
 def make_logs(entry):
@@ -101,21 +102,21 @@ def write_logs(log):
     print(log, file=open(log_post, 'a+', encoding='utf-8'))
 
 def make_sys():
-    path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
+    path = _babase.app.python_directory_user +'/sys/'+_babase.app.version
     if not os.path.exists(path):
         # Old method:
-        # import ba.modutils as utils
+        # import babase.modutils as utils
         # utils.create_user_system_scripts()
         make_sys_wordaround(path)
-        if _ba.app.platform == 'android':
+        if babase.app.classic.platform == 'android':
             if path.find('/0/'):
                 path = path.split('/0/')[1]
-        ba.screenmessage(f'Scripts created at {path}',color=(0, 1, 0))
-        ba.screenmessage('Restart BombSquad to use them',color=(0, 1, 0))
-        ba.app.config['Plugins'][__name__+'.create_sys']['enabled'] = False
-        ba.app.config.apply_and_commit()
+        _babase.screenmessage(f'Scripts created at {path}',color=(0, 1, 0))
+        _babase.screenmessage('Restart BombSquad to use them',color=(0, 1, 0))
+        babase.app.config['Plugins'][__name__+'.create_sys']['enabled'] = False
+        babase.app.config.apply_and_commit()
     else:
-        ba.screenmessage('Cannot run '+__name__+'.create_sys\nScripts already exist :/',color=(1,0,0))
+        _babase.screenmessage('Cannot run '+__name__+'.create_sys\nScripts already exist :/',color=(1,0,0))
 
 def make_sys_wordaround(path):
     # With continued increasing restrictions of Android,
@@ -123,7 +124,7 @@ def make_sys_wordaround(path):
     # Luckily we are still able to write files.
     # So as a "workaround" we create a zip of in-game folders and unzip them :D
     from shutil import make_archive, unpack_archive, rmtree
-    sys_zip = make_archive('sys_zip', 'zip', _ba.app.python_directory_app)
+    sys_zip = make_archive('sys_zip', 'zip', _babase.app.python_directory_app)
     unpack_archive(sys_zip, path)
     
     # We also need to delete all `__pycache__` folders
@@ -133,71 +134,49 @@ def make_sys_wordaround(path):
             rmtree(pycache_folder)
 
 def yeet_sys():
-    path = _ba.app.python_directory_user +'/sys/'+_ba.app.version
+    path = _babase.app.python_directory_user +'/sys/'+_babase.app.version
     if os.path.exists(path):
-        import ba.modutils as utils
+        import babase.modutils as utils
         utils.delete_user_system_scripts()
-        ba.screenmessage('Scripts deleted!',color=(1, 1, 0))
-        ba.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
-        ba.app.config['Plugins'][__name__+'.delete_sys']['enabled'] = False
-        ba.app.config.apply_and_commit()
+        _babase.screenmessage('Scripts deleted!',color=(1, 1, 0))
+        _babase.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
+        babase.app.config['Plugins'][__name__+'.delete_sys']['enabled'] = False
+        babase.app.config.apply_and_commit()
     else:
-        ba.screenmessage('Cannot run '+__name__+'.delete_sys\nNo Scripts exist :/',color=(1,0,0))
-
-def update_mods():
-    mods_folder = _ba.env()['python_directory_user']
-    for mod in os.listdir(mods_folder):
-        if mod.endswith('.py') and not mod==__name__+'.py':
-            data = open(mods_folder+os.sep+mod).read()
-            data = data.replace('#'+' ba_meta require api 6', '#'+' ba_meta require api 7')
-            data = data.replace('def on_app_launch(self)', 'def on_app_running(self)')
-            data = data.replace('self.on_app_launch', 'self.on_app_running')
-            with open(mods_folder+os.sep+mod, 'w') as file:
-                file.write(data)
-                file.close()
-    ba.screenmessage('Updated mods to 1.7!', color=(0,1,0))
-    ba.screenmessage('All Mods are NOT guaranteed to work', color=(1,1,0))
-    ba.app.config['Plugins'][__name__+'.update_16mods_to_17']['enabled'] = False
-    ba.app.config.apply_and_commit()
+        _babase.screenmessage('Cannot run '+__name__+'.delete_sys\nNo Scripts exist :/',color=(1,0,0))
 
 
 
 
 # ba_meta export plugin
-class update_16mods_to_17(ba.Plugin):
-    def __init__(self):
-        update_mods()
-
-
-# ba_meta export plugin
-class get_logs(ba.Plugin):
+class get_logs(babase.Plugin):
     def __init__(self):
         make_folder()
         open(log_post, 'w+').close()
         dump_cache_logs()
-        ba.app.log_handler.add_callback(make_logs)
+        baenv._g_env_config.log_handler.add_callback(make_logs)
 
 
 # ba_meta export plugin
-class get_config(ba.Plugin):
+class get_config(babase.Plugin):
     def __init__(self):
         make_folder()
-        configs = ba.app.config_file_path
+        configs = babase.app.config_file_path
         with open(configs) as f:
             make_config(f.read())
             f.close()
 
 
 # ba_meta export plugin
-class create_sys(ba.Plugin):
+class create_sys(babase.Plugin):
     def __init__(self):
-        ba.timer(2.5, make_sys)
+        babase.apptimer(2.5, make_sys)
 
 
 # ba_meta export plugin
-class delete_sys(ba.Plugin):
+class delete_sys(babase.Plugin):
     def __init__(self):
-        ba.timer(3, yeet_sys)
+        babase.apptimer(3, yeet_sys)
 
 
 
@@ -205,15 +184,15 @@ class delete_sys(ba.Plugin):
 
 
 
-class Player(ba.Player['Team']):
+class Player(bs.Player['Team']):
     """Our player type for this game."""
-class Team(ba.Team[Player]):
+class Team(bs.Team[Player]):
     """Our team type for this game."""
 
-# ba_meta export game
-class Terminal_get3Dpoint(ba.TeamGameActivity[Player, Team]):
+# ba_meta export bascenev1.GameActivity
+class Terminal_get3Dpoint(bs.TeamGameActivity[Player, Team]):
     name = '3D co-ordinate point'
-    available_settings = [ba.BoolSetting('Boxes', default=False), ba.BoolSetting('Points', default=False)]
+    available_settings = [bs.BoolSetting('Boxes', default=False), bs.BoolSetting('Points', default=False)]
     description = 'Get 3D co-ordinate point of ANY map!'
 
     def __init__(self, settings: dict):
@@ -223,13 +202,13 @@ class Terminal_get3Dpoint(ba.TeamGameActivity[Player, Team]):
 
     @classmethod
     def supports_session_type(cls, sessiontype):
-        return (issubclass(sessiontype, ba.DualTeamSession) or issubclass(sessiontype, ba.FreeForAllSession))
+        return (issubclass(sessiontype, bs.DualTeamSession) or issubclass(sessiontype, bs.FreeForAllSession))
 
     @classmethod
     def get_supported_maps(cls, sessiontype):
         # Support every single map registered to the game...
         maps = []
-        for map in _ba.app.maps:
+        for map in babase.app.classic.maps:
             maps.append(map)
         return maps
 
@@ -243,37 +222,36 @@ class Terminal_get3Dpoint(ba.TeamGameActivity[Player, Team]):
     def spawn_boxes(self):
         for box in self.map.defs.boxes:
             box_pt = self.map.defs.boxes[box]
-            box_locator = ba.newnode('locator', attrs={'shape':'box', 'position':( box_pt[0], box_pt[1], box_pt[2]), 'color':(1,1,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(box_pt[6], box_pt[7], box_pt[8])})
-            mnode = ba.newnode('math', owner=box_locator, attrs={ 'input1': (0, 0, 0), 'operation': 'add'})
+            box_locator = bs.newnode('locator', attrs={'shape':'box', 'position':( box_pt[0], box_pt[1], box_pt[2]), 'color':(1,1,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(box_pt[6], box_pt[7], box_pt[8])})
+            mnode = bs.newnode('math', owner=box_locator, attrs={ 'input1': (0, 0, 0), 'operation': 'add'})
             box_locator.connectattr('position', mnode, 'input2')
-            box_text = ba.newnode('text', owner=box_locator, attrs={ 'text': box, 'in_world': True, 'shadow': 0, 'flatness': 0, 'color': (1,1,1), 'scale': 0.01, 'h_align': 'center'})
+            box_text = bs.newnode('text', owner=box_locator, attrs={ 'text': box, 'in_world': True, 'shadow': 0, 'flatness': 0, 'color': (1,1,1), 'scale': 0.01, 'h_align': 'center'})
             mnode.connectattr('output', box_text, 'position')
 
     def spawn_points(self):
         for point in self.map.defs.points:
             display_pt = self.map.defs.points[point]
             if len(display_pt) == 6:
-                point_locator = ba.newnode('locator', attrs={'shape':'box', 'position':( display_pt[0], display_pt[1], display_pt[2]), 'color':(1,1,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(display_pt[3], display_pt[4], display_pt[5])})
+                point_locator = bs.newnode('locator', attrs={'shape':'box', 'position':( display_pt[0], display_pt[1], display_pt[2]), 'color':(1,1,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(display_pt[3], display_pt[4], display_pt[5])})
             elif len(display_pt) == 3:
-                point_locator = ba.newnode('locator',attrs={'shape':'circle','position':(display_pt[0], display_pt[1], display_pt[2]),'color':(1, 1, 0),'opacity':1,'draw_beauty':True,'additive':False,'drawShadow':False,'size': (0.4,0.4,0.4)})
+                point_locator = bs.newnode('locator',attrs={'shape':'circle','position':(display_pt[0], display_pt[1], display_pt[2]),'color':(1, 1, 0),'opacity':1,'draw_beauty':True,'additive':False,'drawShadow':False,'size': (0.4,0.4,0.4)})
             else:
                 print('Invalid entry of;',point,'values given:',display_pt)
                 continue
-            mnode = ba.newnode('math', owner=point_locator, attrs={ 'input1': (0, 0, 0), 'operation': 'add'})
+            mnode = bs.newnode('math', owner=point_locator, attrs={ 'input1': (0, 0, 0), 'operation': 'add'})
             point_locator.connectattr('position', mnode, 'input2')
-            point_text = ba.newnode('text', owner=point_locator, attrs={ 'text': point, 'in_world': True, 'shadow': 1.0, 'flatness': 1.0, 'color': (0,0,0), 'scale': 0.01, 'h_align': 'center'})
+            point_text = bs.newnode('text', owner=point_locator, attrs={ 'text': point, 'in_world': True, 'shadow': 1.0, 'flatness': 1.0, 'color': (0,0,0), 'scale': 0.01, 'h_align': 'center'})
             mnode.connectattr('output', point_text, 'position')
 
     def end_game(self):
-        results = ba.GameResults()
+        results = bs.GameResults()
         for team in self.teams:
             results.set_team_score(team, team.score)
         self.end(results=results)
 
     def handlemessage(self, msg):
-        if isinstance(msg, ba._messages.PlayerDiedMessage):
+        if isinstance(msg, bs._messages.PlayerDiedMessage):
             self.respawn_player(msg.getplayer(self.playertype), 1)
         else:
             return super().handlemessage(msg)
         return None
-
