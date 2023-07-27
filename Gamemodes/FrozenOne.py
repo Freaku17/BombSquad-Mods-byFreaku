@@ -1,13 +1,13 @@
-#Frozen One ported
-#By your friend: @[Just] Freak#4999
+# Ported by your friend: Freaku
 
 
-import ba
-from bastd.game.chosenone import Player, ChosenOneGame
+import babase
+import bascenev1 as bs
+from bascenev1lib.game.chosenone import Player, ChosenOneGame
 
 
-# ba_meta require api 7
-# ba_meta export game
+# ba_meta require api 8
+# ba_meta export bascenev1.GameActivity
 class FrozenOneGame(ChosenOneGame):
     name = 'Frozen One'
 
