@@ -255,8 +255,16 @@ def assignFloInputs(clientID: int):
                 i.assigninput(babase.InputType.LEFT_RIGHT, floater.leftright)
 
 
-
+# Display chat icon, but if user open/close gather it may disappear
 bui.set_party_icon_always_visible(True)
+
+
+old_piv = bui.set_party_icon_always_visible
+def new_piv(*args, **kwargs):
+    # Do not let chat icon go away
+    old_piv(True)
+bui.set_party_icon_always_visible = new_piv
+
 
 old_fcm = bs.chatmessage
 def new_chat_message(*args, **kwargs):
