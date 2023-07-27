@@ -1,4 +1,4 @@
-- NOTE: Updating Mods for 1.7.20+ (or API 8) is in progress. Only Terminal.py has been done for now.
+- NOTE: Updating Mods for 1.7.20+ (or API 8) is in progress. Only MusicalFlags.py is remains now.
 
 - 👋 Hi, My discord: @[Just] Freak#4999
 - ❤️ Learning Python, All my Mods can be found here (BombSquad v1.7+)
