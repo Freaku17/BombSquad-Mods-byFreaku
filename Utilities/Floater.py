@@ -1,4 +1,4 @@
-#Ported by: Freaku / @[Just] Freak#4999
+# Ported by your friend: Freaku
 
 #Join BCS:
 # https://discord.gg/ucyaesh
@@ -9,24 +9,27 @@
 
 
 
-# ba_meta require api 7
+# ba_meta require api 8
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import _ba,ba,random,math
-from bastd.gameutils import SharedObjects
-from bastd.actor.bomb import Bomb
-from bastd.actor.popuptext import PopupText
+import _babase, babase, random, math
+import bauiv1 as bui
+import bascenev1 as bs
+from bascenev1lib.gameutils import SharedObjects
+from bascenev1lib.actor.bomb import Bomb
+from bascenev1lib.actor.popuptext import PopupText
+from bauiv1lib.party import PartyWindow
 if TYPE_CHECKING:
     from typing import Optional
 
 
-class Floater(ba.Actor):
+class Floater(bs.Actor):
     def __init__(self, bounds):
         super().__init__()
         shared = SharedObjects.get()
         self.controlled = False
         self.source_player = None
-        self.floaterMaterial = ba.Material()
+        self.floaterMaterial = bs.Material()
         self.floaterMaterial.add_actions(
             conditions=('they_have_material',
                         shared.player_material),
@@ -46,21 +49,21 @@ class Floater(ba.Actor):
         self.py = "random.uniform(self.pos[1],self.pos[4])"
         self.pz = "random.uniform(self.pos[2],self.pos[5])"
 
-        self.node = ba.newnode(
+        self.node = bs.newnode(
             'prop',
             delegate=self,
             owner=None,
             attrs={
                 'position': (eval(self.px), eval(self.py), eval(self.pz)),
-                'model':
-                ba.getmodel('landMine'),
-                'light_model':
-                ba.getmodel('landMine'),
+                'mesh':
+                bs.getmesh('landMine'),
+                'light_mesh':
+                bs.getmesh('landMine'),
                 'body':
                 'landMine',
                 'body_scale':
                 3,
-                'model_scale':
+                'mesh_scale':
                 3.1,
                 'shadow_size':
                 0.25,
@@ -69,21 +72,21 @@ class Floater(ba.Actor):
                 'gravity_scale':
                 0.0,
                 'color_texture':
-                ba.gettexture('achievementFlawlessVictory'),
+                bs.gettexture('achievementFlawlessVictory'),
                 'reflection':
                 'soft',
                 'reflection_scale': [0.25],
                 'materials':
                 [shared.footing_material, self.floaterMaterial]
             })
-        self.node2 = ba.newnode(
+        self.node2 = bs.newnode(
             'prop',
             owner=self.node,
             attrs={
                 'position': (0, 0, 0),
                 'body':
                 'sphere',
-                'model':
+                'mesh':
                 None,
                 'color_texture':
                 None,
@@ -94,7 +97,7 @@ class Floater(ba.Actor):
                 'density':
                 999999,
                 'reflection_scale': [1.0],
-                'model_scale':
+                'mesh_scale':
                 1.0,
                 'gravity_scale':
                 0,
@@ -170,7 +173,7 @@ class Floater(ba.Actor):
         if self.source_player is None:
             return
         if self.source_player.is_alive():
-            ba.timer(1, self.checkPlayerDie)
+            bs.timer(1, self.checkPlayerDie)
             return
         else:
             self.dis()
@@ -196,15 +199,15 @@ class Floater(ba.Actor):
             pn = self.node.position
             dist = self.distance(pn[0], pn[1], pn[2], px, py, pz)
             self.node.velocity = ((px - pn[0]) / dist, (py - pn[1]) / dist, (pz - pn[2]) / dist)
-            ba.timer(dist-1, ba.WeakCall(self.move), suppress_format_warning=True)
+            bs.timer(dist-1, bs.WeakCall(self.move)) #suppress_format_warning=True)
 
     def handlemessage(self, msg):
-        if isinstance(msg, ba.DieMessage):
+        if isinstance(msg, bs.DieMessage):
             self.node.delete()
             self.node2.delete()
             self.controlled = False
-        elif isinstance(msg, ba.OutOfBoundsMessage):
-            self.handlemessage(ba.DieMessage())
+        elif isinstance(msg, bs.OutOfBoundsMessage):
+            self.handlemessage(bs.DieMessage())
         else:
             super().handlemessage(msg)
 
@@ -214,18 +217,18 @@ class Floater(ba.Actor):
 
 
 def assignFloInputs(clientID: int):
-    with ba.Context(_ba.get_foreground_host_activity()):
-        activity = ba.getactivity()
+    activity = bs.get_foreground_host_activity()
+    with activity.context:
         if not hasattr(activity, 'flo') or not activity.flo.node.exists():
             try: activity.flo = Floater(activity.map.get_def_bound_box('map_bounds'))
             except: return #Perhaps using in main-menu/score-screen
         floater = activity.flo
         if floater.controlled:
-            ba.screenmessage('Floater is already being controlled', color=(1, 0, 0), transient=True, clients=[clientID])
+            bs.broadcastmessage('Floater is already being controlled', color=(1, 0, 0), transient=True, clients=[clientID])
             return
-        ba.screenmessage('You Gained Control Over The Floater!\n Press Bomb to Throw Bombs and Punch to leave!', clients=[clientID], transient=True, color=(0, 1, 1))
+        bs.broadcastmessage('You Gained Control Over The Floater!\n Press Bomb to Throw Bombs and Punch to leave!', clients=[clientID], transient=True, color=(0, 1, 1))
 
-        for i in _ba.get_foreground_host_activity().players:
+        for i in activity.players:
             if i.sessionplayer.inputdevice.client_id == clientID:
                 def dis(i, floater):
                     i.actor.node.invincible = False
@@ -235,33 +238,34 @@ def assignFloInputs(clientID: int):
                 ps = i.actor.node.position
                 i.actor.node.invincible = True
                 floater.node.position = (ps[0], ps[1] + 1.0, ps[2])
-                ba.timer(1, floater.pop)
-                i.actor.node.hold_node = ba.Node(None)
+                bs.timer(1, floater.pop)
+                i.actor.node.hold_node = bs.Node(None)
                 i.actor.node.hold_node = floater.node2
                 i.actor.connect_controls_to_player()
                 i.actor.disconnect_controls_from_player()
                 i.resetinput()
                 floater.source_player = i
                 floater.con()
-                i.assigninput(ba.InputType.PICK_UP_PRESS, floater.up)
-                i.assigninput(ba.InputType.PICK_UP_RELEASE, floater.upR)
-                i.assigninput(ba.InputType.JUMP_PRESS, floater.down)
-                i.assigninput(ba.InputType.BOMB_PRESS, floater.drop)
-                i.assigninput(ba.InputType.PUNCH_PRESS, ba.Call(dis, i, floater))
-                i.assigninput(ba.InputType.UP_DOWN, floater.updown)
-                i.assigninput(ba.InputType.LEFT_RIGHT, floater.leftright)
+                i.assigninput(babase.InputType.PICK_UP_PRESS, floater.up)
+                i.assigninput(babase.InputType.PICK_UP_RELEASE, floater.upR)
+                i.assigninput(babase.InputType.JUMP_PRESS, floater.down)
+                i.assigninput(babase.InputType.BOMB_PRESS, floater.drop)
+                i.assigninput(babase.InputType.PUNCH_PRESS, babase.Call(dis, i, floater))
+                i.assigninput(babase.InputType.UP_DOWN, floater.updown)
+                i.assigninput(babase.InputType.LEFT_RIGHT, floater.leftright)
 
 
 
+bui.set_party_icon_always_visible(True)
 
-old_fcm = _ba.chatmessage
-def new_chat_message(msg: Union[str, ba.Lstr], clients: Sequence[int] = None, sender_override: str = None):
-    old_fcm(msg, clients, sender_override)
-    if msg == '/floater':
+old_fcm = bs.chatmessage
+def new_chat_message(*args, **kwargs):
+    old_fcm(*args, **kwargs)
+    if args[0] == '/floater':
         try: assignFloInputs(-1)
         except: pass
-_ba.chatmessage = new_chat_message
+bs.chatmessage = new_chat_message
 
 # ba_meta export plugin
-class byFreaku(ba.Plugin):
+class byFreaku(babase.Plugin):
     def __init__(self): pass
