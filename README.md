@@ -1,7 +1,5 @@
-- NOTE: Updating Mods for 1.7.20+ (or API 8) is in progress. Only MusicalFlags.py is remains now.
-
 - 👋 Hi, My discord: @[Just] Freak#4999
-- ❤️ Learning Python, All my Mods can be found here (BombSquad v1.7+)
+- ❤️ Learning Python, All my Mods can be found here (BombSquad v1.7.20+ or API 8)
 - 🔥 Press [![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white "Download zip")](https://github.com/Freaku17/BombSquad-Mods-byFreaku/archive/refs/heads/main.zip) 
 
 Then extract and copy paste *the files* in your BombSquad folder.
