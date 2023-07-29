@@ -1,4 +1,4 @@
-#Made by your friend: Freaku / @[Just] Freak#4999
+# Made by your friend: Freaku
 
 
 # Defines a simple plugin that allows you to:
@@ -91,7 +91,7 @@ def make_config(entry):
 
 def dump_cache_logs():
     # Dumps all cache logs (including DEBUG ones)
-    for entry in baenv._g_env_config.log_handler.get_cached().entries:
+    for entry in baenv._EnvGlobals.get().config.log_handler.get_cached().entries:
         write_logs(entry.message)
 
 def make_logs(entry):
@@ -154,7 +154,7 @@ class get_logs(babase.Plugin):
         make_folder()
         open(log_post, 'w+').close()
         dump_cache_logs()
-        baenv._g_env_config.log_handler.add_callback(make_logs)
+        baenv._EnvGlobals.get().config.log_handler.add_callback(make_logs)
 
 
 # ba_meta export plugin
@@ -254,4 +254,5 @@ class Terminal_get3Dpoint(bs.TeamGameActivity[Player, Team]):
             self.respawn_player(msg.getplayer(self.playertype), 1)
         else:
             return super().handlemessage(msg)
+        return None
         return None
