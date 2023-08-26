@@ -4,7 +4,7 @@
 # Defines a simple plugin that allows you to:
 ### See any errors of your mods (if present) in folder BombSquad/console/logs.txt
 ### Get config contents
-### Create/Delete sys
+### Create/Delete system scripts
 ### Get 3D co-ordinate points in any Map!
 ### Get internal packages
 
@@ -53,7 +53,7 @@
 
 # ----- For beginners -----
 '''
-# Use sys in Plugins
+# Use system_scripts in Plugins
 # and a Code Editor app (on Play Store)
 
 # Then start playing (editing) those internal .py files
