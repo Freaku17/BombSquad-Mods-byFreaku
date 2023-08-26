@@ -6,6 +6,7 @@
 ### Get config contents
 ### Create/Delete sys
 ### Get 3D co-ordinate points in any Map!
+### Get internal packages
 
 
 # NOTE: Please perform the activities to log, if its a gamemode pls open and play it and then see logs. If its a window please touch buttons and then see logs
@@ -52,7 +53,7 @@
 
 # ----- For beginners -----
 '''
-# Use create_sys / delete_sys in Plugins
+# Use sys in Plugins
 # and a Code Editor app (on Play Store)
 
 # Then start playing (editing) those internal .py files
@@ -72,10 +73,15 @@
 
 # ba_meta require api 8
 
-import _babase, babase, baenv, os
+import _babase
+import babase
+import baenv
+import os
 import bascenev1 as bs
+import bauiv1 as bui
 from efro.log import LogLevel
-folder = _babase.env()['python_directory_user'] + "/console/"
+from bauiv1lib.fileselector import FileSelectorWindow
+folder = _babase.app.python_directory_user + "/console/"
 log_post = folder + 'logs.txt'
 config_post = folder + 'config.txt'
 
@@ -101,51 +107,41 @@ def make_logs(entry):
 def write_logs(log):
     print(log, file=open(log_post, 'a+', encoding='utf-8'))
 
-def make_sys():
-    path = _babase.app.python_directory_user +'/sys/'+_babase.app.version
-    if not os.path.exists(path):
-        # Old method:
-        # import babase.modutils as utils
-        # utils.create_user_system_scripts()
-        make_sys_wordaround(path)
-        if babase.app.classic.platform == 'android':
-            if path.find('/0/'):
-                path = path.split('/0/')[1]
-        _babase.screenmessage(f'Scripts created at {path}',color=(0, 1, 0))
-        _babase.screenmessage('Restart BombSquad to use them',color=(0, 1, 0))
-        babase.app.config['Plugins'][__name__+'.create_sys']['enabled'] = False
-        babase.app.config.apply_and_commit()
-    else:
-        _babase.screenmessage('Cannot run '+__name__+'.create_sys\nScripts already exist :/',color=(1,0,0))
-
 def make_sys_wordaround(path):
     # With continued increasing restrictions of Android,
     # it is not possible to "view" in-game folders copied to an external path.
     # Luckily we are still able to write files.
     # So as a "workaround" we create a zip of in-game folders and unzip them :D
     from shutil import make_archive, unpack_archive, rmtree
-    sys_zip = make_archive('sys_zip', 'zip', _babase.app.python_directory_app)
+    sys_zip = make_archive(folder+'sys_zip', 'zip', _babase.app.python_directory_app)
     unpack_archive(sys_zip, path)
+    os.remove(sys_zip)
     
     # We also need to delete all `__pycache__` folders
     for root, dirs, files in os.walk(path):
         if '__pycache__' in dirs:
             pycache_folder = os.path.join(root, '__pycache__')
             rmtree(pycache_folder)
+    
+    if babase.app.classic.platform == 'android':
+        if '/0/' in path:
+            path = path.split('/0/')[1]
+    bui.screenmessage(f'Scripts created at {path}',color=(0, 1, 0))
+    bui.screenmessage('Restart BombSquad to use them',color=(0, 1, 0))
 
 def yeet_sys():
-    path = _babase.app.python_directory_user +'/sys/'+_babase.app.version
-    if os.path.exists(path):
-        import babase.modutils as utils
-        utils.delete_user_system_scripts()
-        _babase.screenmessage('Scripts deleted!',color=(1, 1, 0))
-        _babase.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
-        babase.app.config['Plugins'][__name__+'.delete_sys']['enabled'] = False
-        babase.app.config.apply_and_commit()
-    else:
-        _babase.screenmessage('Cannot run '+__name__+'.delete_sys\nNo Scripts exist :/',color=(1,0,0))
+    import babase.modutils as utils
+    utils.delete_user_system_scripts()
+    bui.screenmessage('Scripts deleted!',color=(1, 1, 0))
+    bui.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
 
-
+def copy_internal_packages(path):
+    copy_dir = folder + path.split('//')[1]
+    from shutil import make_archive, unpack_archive, rmtree
+    content_zip = make_archive(folder+'content_zip', 'zip', path)
+    unpack_archive(content_zip, copy_dir)
+    os.remove(content_zip)
+    bui.screenmessage('Copying completed!')
 
 
 # ba_meta export plugin
@@ -168,15 +164,43 @@ class get_config(babase.Plugin):
 
 
 # ba_meta export plugin
-class create_sys(babase.Plugin):
-    def __init__(self):
-        babase.apptimer(2.5, make_sys)
+class system_scripts(babase.Plugin):
+    def has_settings_ui(self):
+        return True
+    
+    def show_settings_ui(self, source_widget):
+        path = _babase.app.python_directory_user +'/sys/'+_babase.app.version
+        if not os.path.exists(path):
+            # Old method:
+            # import babase.modutils as utils
+            # utils.create_user_system_scripts()
+            make_sys_wordaround(path)
+        else:
+            yeet_sys()
 
 
 # ba_meta export plugin
-class delete_sys(babase.Plugin):
-    def __init__(self):
-        babase.apptimer(3, yeet_sys)
+class internal_packages(babase.Plugin):
+    def has_settings_ui(self):
+        return True
+    
+    def show_settings_ui(self, source_widget):
+        if babase.app.classic.platform != 'android':
+            bui.screenmessage('Only for mobile users!')
+            return
+        internal_packages_path = '/data/data/net.froemling.bombsquad/'
+        FileSelectorWindow(internal_packages_path,
+            callback=self.start_copy_internal_packages,
+            show_base_path=True,
+            allow_folders=True)
+    
+    def start_copy_internal_packages(self, path):
+        if path:
+            bui.screenmessage('Copying to ' + (folder if '/0/' not in folder else folder.split('/0/')[1]))
+            
+            # To avoid freezing the game, we execute this in another thread
+            import threading
+            threading.Thread(target=copy_internal_packages, args=(path, )).start()
 
 
 
@@ -254,5 +278,4 @@ class Terminal_get3Dpoint(bs.TeamGameActivity[Player, Team]):
             self.respawn_player(msg.getplayer(self.playertype), 1)
         else:
             return super().handlemessage(msg)
-        return None
         return None
