@@ -24,3 +24,8 @@ Then extract and copy paste *the files* in your BombSquad folder.
       * Shows error of the mod you're working on (read instructions in-file)
    * TowerD-Unlocked
       * Unlocks TowerD map to use in Teams/FFA
+   * Translate
+      * Translate yours/other chats with ease!
+      * Single Click message to translate. Double Click message to copy.
+      * Double Click 'Trans' button to open translation settings.
+      * Compatible with other PW mods (like advanced_party_window)
