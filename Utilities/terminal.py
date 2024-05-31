@@ -169,7 +169,7 @@ class system_scripts(babase.Plugin):
         return True
     
     def show_settings_ui(self, source_widget):
-        path = _babase.app.env.python_directory_user +'/sys/'+_babase.app.env.version
+        path = _babase.app.env.python_directory_user +'/sys/'+_babase.app.env.engine_version
         if not os.path.exists(path):
             # Old method:
             # import babase.modutils as utils
