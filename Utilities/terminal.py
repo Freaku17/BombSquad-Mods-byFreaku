@@ -1,8 +1,13 @@
 # Made by your friend: Freaku
 
+__version__ = '1.7.36+'
+# Starting versioning of terminal.py henceforth,
+# since many users complained problems which was actually caused due to them using an older version of us.
+
 
 # Defines a simple plugin that allows you to:
 ### See any errors of your mods (if present) in folder BombSquad/console/logs.txt
+### Export logs (current & logs generated in previous launch too)
 ### Get config contents
 ### Create/Delete system scripts
 ### Get 3D co-ordinate points in any Map!
@@ -81,14 +86,15 @@ import bascenev1 as bs
 import bauiv1 as bui
 from efro.log import LogLevel
 from bauiv1lib.fileselector import FileSelectorWindow
+from bauiv1lib.confirm import ConfirmWindow
 folder = _babase.app.env.python_directory_user + "/console/"
 log_post = folder + 'logs.txt'
+previous_log_post = folder + 'logs (previous game launch).txt'
 config_post = folder + 'config.txt'
 
 
 def make_folder():
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    os.makedirs(folder, exist_ok=True)
 
 def make_config(entry):
     with open(config_post, 'w+') as e:
@@ -132,8 +138,6 @@ def make_sys_wordaround(path):
 def yeet_sys():
     import babase.modutils as utils
     utils.delete_user_system_scripts()
-    bui.screenmessage('Scripts deleted!',color=(1, 1, 0))
-    bui.screenmessage('Restart BombSquad to use internal',color=(1, 1, 0))
 
 def copy_internal_packages(path):
     copy_dir = folder + path.split('//')[1]
@@ -143,11 +147,37 @@ def copy_internal_packages(path):
     os.remove(content_zip)
     bui.screenmessage('Copying completed!')
 
+class reConfirmWindow(ConfirmWindow):
+    def __init__(self, *args, path, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._path = path
+    
+    def _ok(self) -> None:
+        if not self.root_widget:
+            return
+        bui.containerwidget(
+            edit=self.root_widget,
+            transition=(
+                'out_left'
+                if self._transition_out is None
+                else self._transition_out
+            ),
+        )
+        if self._action is not None:
+            self._action(self._path, create_subfolder = True)
+    
+    def _cancel(self) -> None:
+        super()._cancel()
+        if self._action is not None:
+            self._action(self._path, create_subfolder=False)
+
 
 # ba_meta export plugin
 class get_logs(babase.Plugin):
     def __init__(self):
         make_folder()
+        if os.path.exists(log_post):
+            os.rename(log_post, previous_log_post)
         open(log_post, 'w+').close()
         dump_cache_logs()
         baenv._EnvGlobals.get().config.log_handler.add_callback(make_logs)
@@ -169,7 +199,8 @@ class system_scripts(babase.Plugin):
         return True
     
     def show_settings_ui(self, source_widget):
-        path = _babase.app.env.python_directory_user +'/sys/'+_babase.app.env.engine_version
+        env = _babase.app.env
+        path = env.python_directory_user + '/sys/' + env.engine_version + '_' + str(env.engine_build_number)
         if not os.path.exists(path):
             # Old method:
             # import babase.modutils as utils
@@ -201,6 +232,56 @@ class internal_packages(babase.Plugin):
             # To avoid freezing the game, we execute this in another thread
             import threading
             threading.Thread(target=copy_internal_packages, args=(path, )).start()
+
+
+# ba_meta export plugin
+class export_logs(babase.Plugin):
+    def has_settings_ui(self):
+        return True
+    
+    def show_settings_ui(self, source_widget):
+        default_directory = _babase.app.env.python_directory_user
+        if babase.app.classic.platform == 'android':
+            default_directory = '/storage/emulated/0/Download/'
+            reConfirmWindow(height = 120, width = 400, text_scale = 5.5,
+                text = 'Create a separate BombSquad folder\n inside ' + default_directory + '?',
+                ok_text = 'Yes, save to folder\nDownload/BombSquad/',
+                cancel_text = 'No, save directly to\n folder Download/',
+                action = self.start_export_logs,
+                path = default_directory)
+            return
+        
+        FileSelectorWindow(default_directory,
+            callback=self.start_export_logs,
+            show_base_path=True,
+            allow_folders=True)
+    
+    def start_export_logs(self, path: str, create_subfolder: bool = False):
+        if create_subfolder:
+            path = path + 'BombSquad/'
+        os.makedirs(path, exist_ok=True)
+        if os.path.exists(log_post):
+            with open(path + '/logs.txt', 'w+') as e:
+                e.write(open(log_post).read())
+                e.close()
+            bui.screenmessage('logs.txt saved')
+        
+        if os.path.exists(previous_log_post):
+            with open(path + '/logs (previous game launch).txt', 'w+') as e:
+                e.write(open(previous_log_post).read())
+                e.close()
+            bui.screenmessage('logs (previous game launch).txt saved')
+
+
+# ba_meta export plugin
+class version(babase.Plugin):
+    def has_settings_ui(self):
+        return True
+    
+    def show_settings_ui(self, source_widget):
+        bui.screenmessage('Tested for bs version: ' + __version__)
+        bui.screenmessage("If you're facing any errors,\nUpdate the plugin: https://github.com/Freaku17/BombSquad-Mods-byFreaku")
+        return
 
 
 
