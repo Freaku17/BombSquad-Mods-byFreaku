@@ -16,7 +16,7 @@ Then extract and copy paste *the files* in your BombSquad folder.
    * Memory Game
    * Arms Race
 
-* Utilities: 4
+* Utilities: 5
    * Floater
       * Type /floater in-game to use
    * IconsKeyboard
