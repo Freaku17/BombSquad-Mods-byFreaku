@@ -1,3 +1,5 @@
+- NOTE: Updating Mods for 1.7.37+ (or API 9) is in progress.
+
 - 👋 Hi, I'm Freaku
 - ❤️ Learning Python
 - 💣 All my [BombSquad](https://www.froemling.net/apps/bombsquad) Mods can be found here (v1.7.20+ or API 8)
