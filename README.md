@@ -1,4 +1,4 @@
-- NOTE: Updating Mods for 1.7.37+ (or API 9) is in progress.
+- NOTE: Updating Mods for 1.7.37+ (or API 9) is in progress. ONLY `Utilities` has been for now!
 
 - 👋 Hi, I'm Freaku
 - ❤️ Learning Python
