@@ -1,6 +1,6 @@
 # Made by your friend: Freaku
 
-__version__ = '1.7.36+'
+__version__ = '1.7.37+'
 # Starting versioning of terminal.py henceforth,
 # since many users complained problems which was actually caused due to them using an older version of us.
 
@@ -76,7 +76,7 @@ __version__ = '1.7.36+'
 
 
 
-# ba_meta require api 8
+# ba_meta require api 9
 
 import _babase
 import babase
@@ -84,7 +84,7 @@ import baenv
 import os
 import bascenev1 as bs
 import bauiv1 as bui
-from efro.log import LogLevel
+from efro.logging import LogLevel
 from bauiv1lib.fileselector import FileSelectorWindow
 from bauiv1lib.confirm import ConfirmWindow
 folder = _babase.app.env.python_directory_user + "/console/"
@@ -220,13 +220,16 @@ class internal_packages(babase.Plugin):
             bui.screenmessage('Only for mobile users!')
             return
         internal_packages_path = '/data/data/net.froemling.bombsquad/'
-        FileSelectorWindow(internal_packages_path,
+        babase.app.ui_v1.get_main_window().main_window_replace(
+            FileSelectorWindow(internal_packages_path,
             callback=self.start_copy_internal_packages,
             show_base_path=True,
             allow_folders=True)
+                )
     
     def start_copy_internal_packages(self, path):
         if path:
+            babase.app.ui_v1.get_main_window().main_window_back()
             bui.screenmessage('Copying to ' + (folder if '/0/' not in folder else folder.split('/0/')[1]))
             
             # To avoid freezing the game, we execute this in another thread
