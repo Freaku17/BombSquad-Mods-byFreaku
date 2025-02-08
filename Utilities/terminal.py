@@ -254,26 +254,31 @@ class export_logs(babase.Plugin):
                 path = default_directory)
             return
         
-        FileSelectorWindow(default_directory,
+        babase.app.ui_v1.get_main_window().main_window_replace(
+            FileSelectorWindow(default_directory,
             callback=self.start_export_logs,
             show_base_path=True,
             allow_folders=True)
+                )
     
     def start_export_logs(self, path: str, create_subfolder: bool = False):
-        if create_subfolder:
-            path = path + 'BombSquad/'
-        os.makedirs(path, exist_ok=True)
-        if os.path.exists(log_post):
-            with open(path + '/logs.txt', 'w+') as e:
-                e.write(open(log_post).read())
-                e.close()
-            bui.screenmessage('logs.txt saved')
-        
-        if os.path.exists(previous_log_post):
-            with open(path + '/logs (previous game launch).txt', 'w+') as e:
-                e.write(open(previous_log_post).read())
-                e.close()
-            bui.screenmessage('logs (previous game launch).txt saved')
+        if path:
+            if babase.app.classic.platform != 'android':
+                babase.app.ui_v1.get_main_window().main_window_back()
+            if create_subfolder:
+                path = path + 'BombSquad/'
+            os.makedirs(path, exist_ok=True)
+            if os.path.exists(log_post):
+                with open(path + '/logs.txt', 'w+') as e:
+                    e.write(open(log_post).read())
+                    e.close()
+                bui.screenmessage('logs.txt saved')
+            
+            if os.path.exists(previous_log_post):
+                with open(path + '/logs (previous game launch).txt', 'w+') as e:
+                    e.write(open(previous_log_post).read())
+                    e.close()
+                bui.screenmessage('logs (previous game launch).txt saved')
 
 
 # ba_meta export plugin
