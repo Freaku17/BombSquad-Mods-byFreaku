@@ -1,3 +1,10 @@
+# Ported by your friend: Freaku
+
+#Join BCS:
+# https://discord.gg/ucyaesh
+
+
+
 # ba_meta require api 9
 
 from __future__ import annotations
