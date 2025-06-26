@@ -38,7 +38,7 @@ class IcyEmitsGame(MeteorShowerGame):
 
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class byFreaku(babase.Plugin):
     def __init__(self):
         ## Campaign support ##
