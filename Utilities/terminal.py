@@ -1,6 +1,6 @@
 # Made by your friend: Freaku
 
-__version__ = '1.7.37+'
+__version__ = '1.7.44+'
 # Starting versioning of terminal.py henceforth,
 # since many users complained problems which was actually caused due to them using an older version of us.
 
@@ -172,7 +172,7 @@ class reConfirmWindow(ConfirmWindow):
             self._action(self._path, create_subfolder=False)
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class get_logs(babase.Plugin):
     def __init__(self):
         make_folder()
@@ -183,7 +183,7 @@ class get_logs(babase.Plugin):
         baenv._EnvGlobals.get().config.log_handler.add_callback(make_logs)
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class get_config(babase.Plugin):
     def __init__(self):
         make_folder()
@@ -193,7 +193,7 @@ class get_config(babase.Plugin):
             f.close()
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class system_scripts(babase.Plugin):
     def has_settings_ui(self):
         return True
@@ -210,7 +210,7 @@ class system_scripts(babase.Plugin):
             yeet_sys()
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class internal_packages(babase.Plugin):
     def has_settings_ui(self):
         return True
@@ -237,7 +237,7 @@ class internal_packages(babase.Plugin):
             threading.Thread(target=copy_internal_packages, args=(path, )).start()
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class export_logs(babase.Plugin):
     def has_settings_ui(self):
         return True
@@ -281,7 +281,7 @@ class export_logs(babase.Plugin):
                 bui.screenmessage('logs (previous game launch).txt saved')
 
 
-# ba_meta export plugin
+# ba_meta export babase.Plugin
 class version(babase.Plugin):
     def has_settings_ui(self):
         return True
