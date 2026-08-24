@@ -58,7 +58,7 @@ This collection includes plugins built entirely from scratch, alongside older, u
 * **Ported Content:** Ownership over the original logic of ported plugins is retained by their respective creators. Only the modernization, API 9 updates, and compatibility fixes are contributed under the MIT license.
 
 > [!NOTE]
-> **To Legacy Authors:** If you are the original author of any ported code in this repository and would like specific attribution addedâ€”or would prefer the code removedâ€”please open a GitHub Issue or reach out directly. Credits will be updated immediately.
+> **To Legacy Authors:** If you are the original author of any ported code in this repository and would like specific attribution added—or would prefer the code removed—please open a GitHub Issue or reach out directly. Credits will be updated immediately.
 
 ---
 <div align="center">
