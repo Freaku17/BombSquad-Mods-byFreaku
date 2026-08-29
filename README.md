@@ -2,7 +2,7 @@
 
 ## 💣 [BombSquad](https://www.froemling.net/apps/bombsquad) Mods by Freaku
 
-🚀 **Supported version:** `v1.7.53+` (API 9)
+🚀 **Supported version:** `v1.8+` (API 9)
 
 🌐 **Server Supported:** All gamemodes work on servers!
 
